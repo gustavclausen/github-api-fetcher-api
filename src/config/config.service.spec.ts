@@ -1,20 +1,28 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from './config.service';
+import { ConfigService, EnvConfig } from './config.service';
 
 describe('ConfigService', (): void => {
-    let service: ConfigService;
+    describe('constructor', (): void => {
+        it('should load configuration from valid env file', (): void => {
+            const service = new ConfigService(`${__dirname}/test-env-files/valid.env`);
 
-    beforeEach(
-        async (): Promise<void> => {
-            const module: TestingModule = await Test.createTestingModule({
-                providers: [ConfigService]
-            }).compile();
+            const expectedConfig: EnvConfig = {
+                PORT: 1337,
+                GITHUB_API_ACCESS_TOKEN: 'top-secret'
+            };
 
-            service = module.get<ConfigService>(ConfigService);
-        }
-    );
+            Object.keys(expectedConfig).forEach(
+                (key): void => {
+                    expect(service.getValue(key)).toBe(expectedConfig[key]);
+                }
+            );
+        });
 
-    it('should be defined', (): void => {
-        expect(service).toBeDefined();
+        it('should throw error when giving invalid env file', (): void => {
+            expect((): ConfigService => new ConfigService(`${__dirname}/test-env-files/invalid.env`)).toThrow();
+        });
+
+        it('should throw error when giving filepath to non-existing file', (): void => {
+            expect((): ConfigService => new ConfigService(`${__dirname}/test-env-files/non-existing.env`)).toThrow();
+        });
     });
 });

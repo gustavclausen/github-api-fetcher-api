@@ -3,27 +3,28 @@ import * as dotenv from 'dotenv';
 import * as Joi from '@hapi/joi';
 
 export interface EnvConfig {
-    [key: string]: string;
+    [key: string]: string | number;
 }
 
-// TODO: Create unit test
 export class ConfigService {
     private readonly envConfig: EnvConfig;
 
-    constructor() {
-        this.envConfig = this.validateInput(this.parseEnvConfig());
+    constructor(envFilePath: string) {
+        const envData = dotenv.parse(this.loadFile(envFilePath));
+        this.envConfig = this.validateInput(envData);
     }
 
-    private parseEnvConfig(): EnvConfig {
-        return dotenv.parse(fs.readFileSync(`${process.env.NODE_ENV}.env`));
+    private loadFile(filePath: string): Buffer {
+        try {
+            return fs.readFileSync(filePath);
+        } catch (err) {
+            throw new Error(`No .env file found on path: ${filePath}`);
+        }
     }
 
     private validateInput(envConfig: EnvConfig): EnvConfig {
         const envSchema: Joi.ObjectSchema = Joi.object({
-            NODE_ENV: Joi.string()
-                .valid(['development', 'production', 'test'])
-                .default('development'),
-            PORT: Joi.number().default(8080),
+            PORT: Joi.number().required(),
             GITHUB_API_ACCESS_TOKEN: Joi.string().required()
         });
 
@@ -35,7 +36,7 @@ export class ConfigService {
         return validatedEnvConfig;
     }
 
-    getValue(key: string): string {
+    getValue(key: string): string | number {
         return this.envConfig[key];
     }
 }
