@@ -15,23 +15,29 @@ export class FetcherService {
     readonly fetcher: APIFetcher;
 
     constructor(config: ConfigService) {
-        this.fetcher = new APIFetcher(config.getValue(env.GITHUB_API_ACCESS_TOKEN));
+        this.fetcher = new APIFetcher(config.getValue(env.GITHUB_API_ACCESS_TOKEN) as string);
     }
 
     /**
-     * TODO: Comment
-     * TODO: Unit test
-     * @param req
-     * @param apiRequest
+     * Retrieves GitHub API access token from header in request, and executes fetch request
+     * (taken as argument) with that token.
+     *
+     * @param req Incoming API request
+     * @param apiFetchCall Call to API fetcher
+     * @returns Resolved value of call to API fetcher
+     *
+     * @throws {UnauthorizedException} Upon receiving bad credentials
+     * @throws {ForbiddenException} Upon hitting rate limit/abuse triggering, or token having insufficient scopes to perform call
+     * @throws {ServiceUnavailableException} When GitHub API server is unavailable
+     * @throws {InternalServerErrorException} When unknown error is thrown
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async fetch<T>(req: Request, apiRequest: (...args: any[]) => Promise<T>): Promise<T> {
-        const defaultAccessToken = this.fetcher.apiAccessToken;
+    async fetch<T>(req: Request, apiFetchCall: Promise<T>): Promise<T> {
+        const currentAccessToken = this.fetcher.apiAccessToken;
 
         try {
-            this.fetcher.apiAccessToken = req.headers[request.ACCESS_TOKEN_HEADER] as string; // Set access token from request header in client
+            this.fetcher.apiAccessToken = req.headers[request.ACCESS_TOKEN_HEADER] as string; // Set access token from request header in fetcher
 
-            return await apiRequest();
+            return await apiFetchCall;
         } catch (error) {
             const requestError = error as RequestError;
             const credentialsErrorMessage = `${requestError.message}. Provided credentials: ${
@@ -48,10 +54,11 @@ export class FetcherService {
                     throw new ServiceUnavailableException('GitHub API server is unavailable.');
                 case ResponseErrorType.NOT_FOUND:
                 case ResponseErrorType.UNKNOWN:
+                default:
                     throw new InternalServerErrorException(`Internal server failure. ${requestError.message}`);
             }
         } finally {
-            this.fetcher.apiAccessToken = defaultAccessToken; // Reset access token in client
+            this.fetcher.apiAccessToken = currentAccessToken; // Reset access token in client
         }
     }
 }

@@ -12,9 +12,6 @@ export class UsersService {
     }
 
     async getUser(req: Request, gitHubUsername: string): Promise<UserProfile | null> {
-        return await this.fetcherService.fetch(
-            req,
-            (): Promise<UserProfile | null> => this.fetcherService.fetcher.user.getProfile(gitHubUsername)
-        );
+        return await this.fetcherService.fetch(req, this.fetcherService.fetcher.user.getProfile(gitHubUsername));
     }
 }
