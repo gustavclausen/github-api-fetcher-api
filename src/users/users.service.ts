@@ -5,9 +5,16 @@ import { Request } from 'express';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly fetcherService: FetcherService) {}
+    private readonly fetcherService: FetcherService;
 
-  async getUser(req: Request, gitHubUsername: string): Promise<UserProfile | null> {
-    return await this.fetcherService.fetch(req, () => this.fetcherService.fetcher.user.getProfile(gitHubUsername));
-  }
+    constructor(fetcherService: FetcherService) {
+        this.fetcherService = fetcherService;
+    }
+
+    async getUser(req: Request, gitHubUsername: string): Promise<UserProfile | null> {
+        return await this.fetcherService.fetch(
+            req,
+            (): Promise<UserProfile | null> => this.fetcherService.fetcher.user.getProfile(gitHubUsername)
+        );
+    }
 }

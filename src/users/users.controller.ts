@@ -5,14 +5,18 @@ import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+    private readonly usersService: UsersService;
 
-  @Get(':gitHubUsername')
-  async getUser(@Req() req: Request, @Param('gitHubUsername') gitHubUserName: string): Promise<UserProfile> {
-    const profile = await this.usersService.getUser(req, gitHubUserName);
+    constructor(usersService: UsersService) {
+        this.usersService = usersService;
+    }
 
-    if (!profile) throw new NotFoundException(`GitHub profile '${gitHubUserName}' not found`);
+    @Get(':gitHubUsername')
+    async getUser(@Req() req: Request, @Param('gitHubUsername') gitHubUserName: string): Promise<UserProfile> {
+        const profile = await this.usersService.getUser(req, gitHubUserName);
 
-    return profile;
-  }
+        if (!profile) throw new NotFoundException(`GitHub profile '${gitHubUserName}' not found`);
+
+        return profile;
+    }
 }
