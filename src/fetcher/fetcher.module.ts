@@ -1,9 +1,10 @@
-import { Module, Global } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { FetcherService } from './fetcher.service';
-import { ConfigService } from '../config/config.service';
+import { ConfigModule } from '../config/config.module';
 
-@Global()
 @Module({
-  providers: [FetcherService, ConfigService]
+  imports: [ConfigModule],
+  providers: [FetcherService],
+  exports: [FetcherService]
 })
 export class FetcherModule {}
