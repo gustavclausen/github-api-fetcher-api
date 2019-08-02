@@ -1,6 +1,5 @@
 import { FetcherService } from './fetcher.service';
 import { Test } from '@nestjs/testing';
-import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
 import { Request } from 'jest-express/lib/request';
 import { Request as ExpressRequest } from 'express';
@@ -18,12 +17,14 @@ describe('FetcherService', (): void => {
     beforeAll(
         async (): Promise<void> => {
             const module = await Test.createTestingModule({
-                imports: [ConfigModule],
-                providers: [FetcherService]
-            })
-                .overrideProvider(ConfigService)
-                .useValue({ getValue: (): string => 'dummy-token' })
-                .compile();
+                providers: [
+                    FetcherService,
+                    {
+                        provide: ConfigService,
+                        useValue: { getValue: (): string => 'dummy-value' }
+                    }
+                ]
+            }).compile();
 
             service = module.get<FetcherService>(FetcherService);
         }
