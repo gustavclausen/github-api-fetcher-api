@@ -1,8 +1,8 @@
-import * as helmet from 'helmet';
+import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
-import { AccessTokenCheckMiddleware } from './access-token-check.middleware';
+import { AccessTokenCheckMiddleware } from './middleware/access-token-check/access-token-check.middleware';
 import { env } from './constants';
 
 async function bootstrap(): Promise<void> {

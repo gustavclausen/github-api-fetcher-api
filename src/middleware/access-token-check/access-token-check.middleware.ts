@@ -1,12 +1,12 @@
+import _ from 'lodash';
 import { Injectable, NestMiddleware, BadRequestException } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { request } from './constants';
+import { request } from '../../constants';
 
 @Injectable()
 export class AccessTokenCheckMiddleware implements NestMiddleware {
-    // TODO: Create test (unit and e2e)
     use(req: Request, _res: Response, next: () => void): void {
-        const accessToken = req.headers[request.ACCESS_TOKEN_HEADER] as string;
+        const accessToken = _.get(req.headers, request.ACCESS_TOKEN_HEADER) as string;
 
         if (!accessToken) {
             throw new BadRequestException(
