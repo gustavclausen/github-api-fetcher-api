@@ -1,6 +1,6 @@
 import { AccessTokenCheckMiddleware } from './access-token-check.middleware';
 import { Request as ExpressRequest, Response } from 'express';
-import { BadRequestException, NestMiddleware } from '@nestjs/common';
+import { UnauthorizedException, NestMiddleware } from '@nestjs/common';
 import { Request } from 'jest-express/lib/request';
 
 describe('AccessTokenCheckMiddleware', (): void => {
@@ -17,10 +17,10 @@ describe('AccessTokenCheckMiddleware', (): void => {
         expect(middleware).toBeDefined();
     });
 
-    it('should throw BadRequestException when request does not contain access token header', (): void => {
+    it('should throw UnauthorizedException when request does not contain access token header', (): void => {
         const request = ({} as unknown) as ExpressRequest;
 
-        expect((): void => middleware.use(request, dummyResponse, null)).toThrowError(BadRequestException);
+        expect((): void => middleware.use(request, dummyResponse, null)).toThrowError(UnauthorizedException);
     });
 
     it('should call next function when request contains valid access token header', (): void => {
