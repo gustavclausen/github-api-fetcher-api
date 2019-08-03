@@ -11,11 +11,11 @@ export class UsersController {
         this.usersService = usersService;
     }
 
-    @Get(':gitHubUsername')
-    async getUser(@Req() req: Request, @Param('gitHubUsername') gitHubUserName: string): Promise<UserProfile> {
-        const profile = await this.usersService.getUser(req, gitHubUserName);
+    @Get(':username')
+    async getUser(@Req() req: Request, @Param('username') username: string): Promise<UserProfile> {
+        const profile = await this.usersService.getUser(req, username);
 
-        if (!profile) throw new NotFoundException(`GitHub profile '${gitHubUserName}' not found`);
+        if (!profile) throw new NotFoundException(`GitHub profile '${username}' not found`);
 
         return profile;
     }
