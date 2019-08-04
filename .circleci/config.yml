@@ -1,0 +1,76 @@
+version: 2
+
+defaults: &defaults
+    working_directory: ~/repo
+    docker:
+        - image: circleci/node:lts
+
+jobs:
+    checkout:
+        <<: *defaults
+        steps:
+            - checkout
+            - attach_workspace:
+                  at: ~/repo
+            # Restore cached dependencies if possible
+            - restore_cache:
+                  keys:
+                      - v1-dependencies-{{ checksum "package.json" }}
+                      # Fallback to using the latest cache if no exact match is found
+                      - v1-dependencies-
+            - run:
+                  name: Install dependencies
+                  command: npm install --save-dev
+            - save_cache:
+                  paths:
+                      - node_modules
+                  key: v1-dependencies-{{ checksum "package.json" }}
+            - persist_to_workspace:
+                  root: .
+                  paths: .
+    build:
+        <<: *defaults
+        steps:
+            - attach_workspace:
+                  at: ~/repo
+            - run:
+                  name: Lint
+                  command: npm run lint
+            - run:
+                  name: Build
+                  command: npm run build
+            - persist_to_workspace:
+                  root: .
+                  paths: .
+    test:
+        <<: *defaults
+        steps:
+            - attach_workspace:
+                  at: ~/repo
+            - run:
+                  name: Load environment variables into .env file
+                  command: cd .circleci && sh ./load_env.sh
+            - run:
+                  name: Unit test
+                  command: NODE_ENV=test && npm run test:cov
+                  environment:
+                      JEST_JUNIT_OUTPUT: 'coverage/junit-results.xml'
+            - run:
+                  name: e2e test
+                  command: NODE_ENV=test && npm run test:e2e
+            - store_test_results:
+                  path: coverage/
+            - store_artifacts:
+                  path: coverage/
+
+workflows:
+    version: 2
+    build-test:
+        jobs:
+            - checkout
+            - build:
+                  requires:
+                      - checkout
+            - test:
+                  requires:
+                      - build
