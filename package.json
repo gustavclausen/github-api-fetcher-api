@@ -64,6 +64,7 @@
         "eslint-plugin-prettier": "^3.1.0",
         "jest": "^24.7.1",
         "jest-express": "^1.10.1",
+        "jest-junit": "^7.0.0",
         "prettier": "^1.17.0",
         "supertest": "^4.0.2",
         "ts-jest": "^24.0.2",
@@ -85,6 +86,14 @@
             "^.+\\.(t|j)s$": "ts-jest"
         },
         "coverageDirectory": "../coverage",
-        "testEnvironment": "node"
+        "testEnvironment": "node",
+        "reporters": [
+            "default",
+            "jest-junit"
+        ]
+    },
+    "jest-junit": {
+        "outputDirectory": "./coverage",
+        "outputName": "./junit-results.xml"
     }
 }
