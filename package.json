@@ -23,6 +23,7 @@
         "@nestjs/common": "^6.0.0",
         "@nestjs/core": "^6.0.0",
         "@nestjs/platform-express": "^6.0.0",
+        "class-validator": "^0.9.1",
         "dotenv": "^8.0.0",
         "github-api-fetcher": "^2.1.0",
         "helmet": "^3.20.0",
