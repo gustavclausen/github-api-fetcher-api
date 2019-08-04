@@ -1,9 +1,10 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsBase64 } from 'class-validator';
 
 export class GistQueryDto {
     @IsNotEmpty()
     ownerUsername: string;
 
     @IsNotEmpty()
-    gistName: string;
+    @IsBase64()
+    gistId: string;
 }

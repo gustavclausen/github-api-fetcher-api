@@ -40,16 +40,16 @@ describe('Gists Controller', (): void => {
             await expect(
                 controller.getGist(({} as unknown) as Request, {
                     ownerUsername: 'dummy-user',
-                    gistName: 'dummy-gist'
+                    gistId: 'dummy-gist'
                 })
             ).rejects.toThrowError(NotFoundException);
         });
 
         it('should return result from GistsService', async (): Promise<void> => {
-            const query: GistQueryDto = { ownerUsername: 'dummy-user', gistName: 'dummy-gist' };
+            const query: GistQueryDto = { ownerUsername: 'dummy-user', gistId: 'dummy-gist' };
             const returnValue = ({
                 ownerName: query.ownerUsername,
-                name: query.gistName
+                name: query.gistId
             } as unknown) as GistProfile;
 
             jest.spyOn(gistsService, 'getGist').mockReturnValue(

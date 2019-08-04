@@ -11,10 +11,7 @@ export class GistsService {
         this.fetcherService = fetcherService;
     }
 
-    async getGist(req: Request, ownerUsername: string, gistName: string): Promise<GistProfile | null> {
-        return await this.fetcherService.fetch(
-            req,
-            this.fetcherService.fetcher.gist.getProfile(ownerUsername, gistName)
-        );
+    async getGist(req: Request, ownerUsername: string, gistId: string): Promise<GistProfile | null> {
+        return await this.fetcherService.fetch(req, this.fetcherService.fetcher.gist.getProfile(ownerUsername, gistId));
     }
 }

@@ -14,9 +14,9 @@ export class GistsController {
 
     @Get()
     async getGist(@Req() req: Request, @Query(ValidationPipe) query: GistQueryDto): Promise<GistProfile> {
-        const profile = await this.gistsService.getGist(req, query.ownerUsername, query.gistName);
+        const profile = await this.gistsService.getGist(req, query.ownerUsername, query.gistId);
 
-        if (!profile) throw new NotFoundException(`GitHub gist '${query.ownerUsername}/${query.gistName}' not found`);
+        if (!profile) throw new NotFoundException(`GitHub gist '${query.ownerUsername}/${query.gistId}' not found`);
 
         return profile;
     }
