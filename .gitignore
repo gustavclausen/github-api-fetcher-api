@@ -16,3 +16,4 @@ lerna-debug.log*
 
 # Other
 *.env
+!**/test-env-files/**/*.env
