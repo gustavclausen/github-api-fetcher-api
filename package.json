@@ -1,9 +1,22 @@
 {
-    "name": "github-fetcher-api",
-    "version": "0.0.1",
-    "description": "",
-    "author": "",
+    "name": "github-api-fetcher-api",
+    "version": "0.1.0",
+    "description": "REST API wrapper for the data fetching client, github-api-fetcher",
+    "author": "Gustav Kofoed Clausen <gustav@gustavclausen.com>",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/gustavclausen/github-api-fetcher-api.git"
+    },
+    "bugs": {
+        "url": "https://github.com/gustavclausen/github-api-fetcher-api/issues"
+    },
+    "homepage": "https://github.com/gustavclausen/github-api-fetcher-api#readme",
+    "keywords": [
+        "github",
+        "api",
+        "fetcher"
+    ],
     "scripts": {
         "build": "rimraf dist && tsc -p tsconfig.build.json",
         "format": "prettier --write \"src/**/*.ts\"",
