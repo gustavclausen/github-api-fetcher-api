@@ -3,12 +3,10 @@ import uuid from 'uuid';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersModule } from '../src/users/users.module';
-import { ConfigService } from '../src/config/config.service';
-import { env, request as constantsRequest } from '../src/constants';
+import { buildGetRequest, buildUnauthorizedGetRequest } from './utils';
 
 describe('UsersController (e2e)', (): void => {
     let app: INestApplication;
-    let validAccessToken: string;
 
     beforeEach(
         async (): Promise<void> => {
@@ -18,30 +16,23 @@ describe('UsersController (e2e)', (): void => {
 
             app = testModule.createNestApplication();
             await app.init();
-
-            const configService = testModule.get<ConfigService>(ConfigService);
-            validAccessToken = configService.getValue(env.GITHUB_API_ACCESS_TOKEN) as string;
         }
     );
 
     describe('GET /:username', (): void => {
-        const sendValidRequest = async (username: string): Promise<request.Response> => {
-            return await request(app.getHttpServer())
-                .get(`/users/${username}`)
-                .set(constantsRequest.ACCESS_TOKEN_HEADER, validAccessToken);
+        const sendRequest = async (resourcePath: string): Promise<request.Response> => {
+            return await buildGetRequest(app, resourcePath);
         };
 
         it('should return 401 if no access token is passed', async (): Promise<void> => {
-            const response = await request(app.getHttpServer())
-                .get(`/users/dummy-user`)
-                .set(constantsRequest.ACCESS_TOKEN_HEADER, '');
+            const response = await buildUnauthorizedGetRequest(app, '/users/dummy-user');
 
             expect(response.status).toBe(401);
         });
 
         it('should return user if existing username is passed', async (): Promise<void> => {
             const username = 'torvalds';
-            const response = await sendValidRequest(username);
+            const response = await sendRequest(`/users/${username}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('username', username);
@@ -49,39 +40,31 @@ describe('UsersController (e2e)', (): void => {
 
         it('should return 404 if non-existing username is passed', async (): Promise<void> => {
             const nonExistingUsername = uuid();
-            const response = await sendValidRequest(nonExistingUsername);
+            const response = await sendRequest(`/users/${nonExistingUsername}`);
 
             expect(response.status).toBe(404);
         });
-    });
 
-    describe('GET /:username/repositories', (): void => {
-        const sendValidRequest = async (username: string): Promise<request.Response> => {
-            return await request(app.getHttpServer())
-                .get(`/users/${username}/repositories`)
-                .set(constantsRequest.ACCESS_TOKEN_HEADER, validAccessToken);
-        };
+        describe('GET /:username/repositories', (): void => {
+            it('should return 401 if no access token is passed', async (): Promise<void> => {
+                const response = await buildUnauthorizedGetRequest(app, '/users/dummy-user/repositories');
 
-        it('should return 401 if no access token is passed', async (): Promise<void> => {
-            const response = await request(app.getHttpServer())
-                .get(`/users/dummy-user/repositories`)
-                .set(constantsRequest.ACCESS_TOKEN_HEADER, '');
+                expect(response.status).toBe(401);
+            });
 
-            expect(response.status).toBe(401);
-        });
+            it('should return repositories if existing username is passed', async (): Promise<void> => {
+                const response = await sendRequest('/users/torvalds/repositories');
 
-        it('should return repositories if existing username is passed', async (): Promise<void> => {
-            const response = await sendValidRequest('torvalds');
+                expect(response.status).toBe(200);
+                expect(response.body.length).toBeGreaterThan(0);
+            });
 
-            expect(response.status).toBe(200);
-            expect(response.body.length).toBeGreaterThan(0);
-        });
+            it('should return 404 if non-existing username is passed', async (): Promise<void> => {
+                const nonExistingUsername = uuid();
+                const response = await sendRequest(`/users/${nonExistingUsername}/repositories`);
 
-        it('should return 404 if non-existing username is passed', async (): Promise<void> => {
-            const nonExistingUsername = uuid();
-            const response = await sendValidRequest(nonExistingUsername);
-
-            expect(response.status).toBe(404);
+                expect(response.status).toBe(404);
+            });
         });
     });
 
