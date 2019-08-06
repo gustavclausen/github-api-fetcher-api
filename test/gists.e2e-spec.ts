@@ -48,7 +48,7 @@ describe('GistsController (e2e)', (): void => {
             const response = await sendRequest(ownerUsername, gistId);
 
             expect(response.status).toBe(200);
-            expect(response.body).toHaveProperty('name', gistId);
+            expect(response.body).toHaveProperty('gistId', gistId);
             expect(response.body).toHaveProperty('ownerUsername', ownerUsername);
         });
 
