@@ -55,6 +55,36 @@ describe('UsersController (e2e)', (): void => {
         });
     });
 
+    describe('GET /:username/repositories', (): void => {
+        const sendValidRequest = async (username: string): Promise<request.Response> => {
+            return await request(app.getHttpServer())
+                .get(`/users/${username}/repositories`)
+                .set(constantsRequest.ACCESS_TOKEN_HEADER, validAccessToken);
+        };
+
+        it('should return 401 if no access token is passed', async (): Promise<void> => {
+            const response = await request(app.getHttpServer())
+                .get(`/users/dummy-user/repositories`)
+                .set(constantsRequest.ACCESS_TOKEN_HEADER, '');
+
+            expect(response.status).toBe(401);
+        });
+
+        it('should return repositories if existing username is passed', async (): Promise<void> => {
+            const response = await sendValidRequest('torvalds');
+
+            expect(response.status).toBe(200);
+            expect(response.body.length).toBeGreaterThan(0);
+        });
+
+        it('should return 404 if non-existing username is passed', async (): Promise<void> => {
+            const nonExistingUsername = uuid();
+            const response = await sendValidRequest(nonExistingUsername);
+
+            expect(response.status).toBe(404);
+        });
+    });
+
     afterAll(
         async (): Promise<void> => {
             await app.close();
