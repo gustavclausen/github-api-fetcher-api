@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserProfile, RepositoryProfileMinified } from 'github-api-fetcher/dist/models';
+import { UserProfile, RepositoryProfileMinified, OrganizationProfileMinified } from 'github-api-fetcher';
 import { FetcherService } from '../fetcher/fetcher.service';
 import { Request } from 'express';
 
@@ -19,6 +19,16 @@ export class UsersService {
         return await this.fetcherService.fetch(
             req,
             this.fetcherService.fetcher.user.getPublicRepositoryOwnerships(username)
+        );
+    }
+
+    async getUsersOrganizationMemberships(
+        req: Request,
+        username: string
+    ): Promise<OrganizationProfileMinified[] | null> {
+        return await this.fetcherService.fetch(
+            req,
+            this.fetcherService.fetcher.user.getOrganizationMemberships(username)
         );
     }
 }

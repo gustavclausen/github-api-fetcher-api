@@ -16,7 +16,13 @@ describe('UsersService', (): void => {
                         provide: FetcherService,
                         useValue: {
                             fetch: fetchMock,
-                            fetcher: { user: { getProfile: jest.fn() } }
+                            fetcher: {
+                                user: {
+                                    getProfile: jest.fn(),
+                                    getPublicRepositoryOwnerships: jest.fn(),
+                                    getOrganizationMemberships: jest.fn()
+                                }
+                            }
                         }
                     }
                 ]
@@ -33,6 +39,22 @@ describe('UsersService', (): void => {
     describe('getUser', (): void => {
         it('should call fetch method on FetcherService', async (): Promise<void> => {
             await service.getUser(({} as unknown) as Request, 'dummy-username');
+
+            expect(fetchMock).toHaveBeenCalled();
+        });
+    });
+
+    describe('getUsersRepositories', (): void => {
+        it('should call fetch method on FetcherService', async (): Promise<void> => {
+            await service.getUsersRepositories(({} as unknown) as Request, 'dummy-username');
+
+            expect(fetchMock).toHaveBeenCalled();
+        });
+    });
+
+    describe('getUsersOrganizationMemberships', (): void => {
+        it('should call fetch method on FetcherService', async (): Promise<void> => {
+            await service.getUsersOrganizationMemberships(({} as unknown) as Request, 'dummy-username');
 
             expect(fetchMock).toHaveBeenCalled();
         });

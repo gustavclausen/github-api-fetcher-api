@@ -66,6 +66,28 @@ describe('UsersController (e2e)', (): void => {
                 expect(response.status).toBe(404);
             });
         });
+
+        describe('GET /:username/organizationMemberships', (): void => {
+            it('should return 401 if no access token is passed', async (): Promise<void> => {
+                const response = await buildUnauthorizedGetRequest(app, '/users/dummy-user/organizationMemberships');
+
+                expect(response.status).toBe(401);
+            });
+
+            it('should return organizations if existing username is passed', async (): Promise<void> => {
+                const response = await sendRequest('/users/gaearon/organizationMemberships');
+
+                expect(response.status).toBe(200);
+                expect(response.body.length).toBeGreaterThan(0);
+            });
+
+            it('should return 404 if non-existing username is passed', async (): Promise<void> => {
+                const nonExistingUsername = uuid();
+                const response = await sendRequest(`/users/${nonExistingUsername}/organizationMemberships`);
+
+                expect(response.status).toBe(404);
+            });
+        });
     });
 
     afterAll(
