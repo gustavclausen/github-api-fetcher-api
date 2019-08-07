@@ -4,7 +4,12 @@ import { UsersService } from './users.service';
 import { FetcherService } from '../fetcher/fetcher.service';
 import { Request } from 'express';
 import { NotFoundException } from '@nestjs/common';
-import { UserProfile, RepositoryProfileMinified, OrganizationProfileMinified } from 'github-api-fetcher';
+import {
+    UserProfile,
+    RepositoryProfileMinified,
+    OrganizationProfileMinified,
+    GistProfileMinified
+} from 'github-api-fetcher';
 
 describe('Users Controller', (): void => {
     let controller: UsersController;
@@ -116,6 +121,34 @@ describe('Users Controller', (): void => {
             expect(await controller.getUsersOrganizationMemberships(({} as unknown) as Request, 'test-user')).toBe(
                 returnValue
             );
+        });
+    });
+
+    describe('getUsersGists', (): void => {
+        it('should throw NotFoundException when UsersService returns null', async (): Promise<void> => {
+            jest.spyOn(userService, 'getUsersGists').mockReturnValue(new Promise((resolve): void => resolve(null)));
+
+            await expect(controller.getUsersGists(({} as unknown) as Request, 'dummy-username')).rejects.toThrowError(
+                NotFoundException
+            );
+        });
+
+        it('should return result from UsersService', async (): Promise<void> => {
+            const returnValue = [
+                ({
+                    gitHubId: 'some-id'
+                } as unknown) as GistProfileMinified
+            ];
+
+            jest.spyOn(userService, 'getUsersGists').mockReturnValue(
+                new Promise(
+                    (resolve): void => {
+                        resolve(returnValue);
+                    }
+                )
+            );
+
+            expect(await controller.getUsersGists(({} as unknown) as Request, 'test-user')).toBe(returnValue);
         });
     });
 });

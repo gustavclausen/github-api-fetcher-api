@@ -1,6 +1,11 @@
 import { Controller, Get, Param, NotFoundException, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserProfile, RepositoryProfileMinified, OrganizationProfileMinified } from 'github-api-fetcher';
+import {
+    UserProfile,
+    RepositoryProfileMinified,
+    OrganizationProfileMinified,
+    GistProfileMinified
+} from 'github-api-fetcher';
 import { Request } from 'express';
 
 @Controller('users/:username')
@@ -42,5 +47,14 @@ export class UsersController {
         if (!organizations) throw new NotFoundException(`GitHub profile '${username}' not found`);
 
         return organizations;
+    }
+
+    @Get('/gists')
+    async getUsersGists(@Req() req: Request, @Param('username') username: string): Promise<GistProfileMinified[]> {
+        const gists = await this.usersService.getUsersGists(req, username);
+
+        if (!gists) throw new NotFoundException(`GitHub profile '${username}' not found`);
+
+        return gists;
     }
 }
