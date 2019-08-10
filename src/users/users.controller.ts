@@ -2,6 +2,7 @@ import { Controller, Get, Param, NotFoundException, Req, Query, ValidationPipe }
 import { UsersService } from './users.service';
 import { Request } from 'express';
 import { MonthQueryDto } from './dto/MonthQueryDto';
+import { YearQueryDto } from './dto/YearQueryDto';
 import {
     UserProfile,
     RepositoryProfileMinified,
@@ -72,6 +73,19 @@ export class UsersController {
             monthQuery.year,
             monthQuery.month
         );
+
+        if (!contributions) throw new NotFoundException(`GitHub profile '${username}' not found`);
+
+        return contributions;
+    }
+
+    @Get('/contributions/commits/year')
+    async getUsersCommitContributionsInYear(
+        @Req() req: Request,
+        @Param('username') username: string,
+        @Query(new ValidationPipe({ transform: true })) yearQuery: YearQueryDto
+    ): Promise<MonthlyContributions[]> {
+        const contributions = await this.usersService.getUsersCommitContributionsInYear(req, username, yearQuery.year);
 
         if (!contributions) throw new NotFoundException(`GitHub profile '${username}' not found`);
 

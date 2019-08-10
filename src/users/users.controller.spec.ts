@@ -5,6 +5,7 @@ import { FetcherService } from '../fetcher/fetcher.service';
 import { Request } from 'express';
 import { NotFoundException } from '@nestjs/common';
 import { MonthQueryDto } from './dto/MonthQueryDto';
+import { YearQueryDto } from './dto/YearQueryDto';
 import {
     UserProfile,
     RepositoryProfileMinified,
@@ -185,6 +186,41 @@ describe('Users Controller', (): void => {
 
             expect(
                 await controller.getUsersCommitContributionsInMonth(({} as unknown) as Request, 'test-user', query)
+            ).toBe(returnValue);
+        });
+    });
+
+    describe('getUsersCommitContributionsInYear', (): void => {
+        it('should throw NotFoundException when UsersService returns null', async (): Promise<void> => {
+            jest.spyOn(userService, 'getUsersCommitContributionsInYear').mockReturnValue(
+                new Promise((resolve): void => resolve(null))
+            );
+
+            await expect(
+                controller.getUsersCommitContributionsInYear(({} as unknown) as Request, 'dummy-username', {
+                    year: 2019
+                })
+            ).rejects.toThrowError(NotFoundException);
+        });
+
+        it('should return result from UsersService', async (): Promise<void> => {
+            const query: YearQueryDto = { year: 2011 };
+            const returnValue = [
+                ({
+                    month: 'JANUARY'
+                } as unknown) as MonthlyContributions
+            ];
+
+            jest.spyOn(userService, 'getUsersCommitContributionsInYear').mockReturnValue(
+                new Promise(
+                    (resolve): void => {
+                        resolve(returnValue);
+                    }
+                )
+            );
+
+            expect(
+                await controller.getUsersCommitContributionsInYear(({} as unknown) as Request, 'test-user', query)
             ).toBe(returnValue);
         });
     });
