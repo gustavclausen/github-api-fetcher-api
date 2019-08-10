@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { FetcherService } from '../fetcher/fetcher.service';
 import { Request } from 'express';
+import { Month } from 'github-api-fetcher';
 
 describe('UsersService', (): void => {
     let service: UsersService;
@@ -21,7 +22,8 @@ describe('UsersService', (): void => {
                                     getProfile: jest.fn(),
                                     getPublicRepositoryOwnerships: jest.fn(),
                                     getOrganizationMemberships: jest.fn(),
-                                    getPublicGists: jest.fn()
+                                    getPublicGists: jest.fn(),
+                                    getCommitContributionsInMonth: jest.fn()
                                 }
                             }
                         }
@@ -64,6 +66,19 @@ describe('UsersService', (): void => {
     describe('getUsersGists', (): void => {
         it('should call fetch method on FetcherService', async (): Promise<void> => {
             await service.getUsersGists(({} as unknown) as Request, 'dummy-username');
+
+            expect(fetchMock).toHaveBeenCalled();
+        });
+    });
+
+    describe('getUsersCommitContributionsInMonth', (): void => {
+        it('should call fetch method on FetcherService', async (): Promise<void> => {
+            await service.getUsersCommitContributionsInMonth(
+                ({} as unknown) as Request,
+                'dummy-username',
+                2019,
+                Month.APRIL
+            );
 
             expect(fetchMock).toHaveBeenCalled();
         });

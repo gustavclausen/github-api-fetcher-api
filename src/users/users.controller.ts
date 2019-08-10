@@ -1,12 +1,14 @@
-import { Controller, Get, Param, NotFoundException, Req } from '@nestjs/common';
+import { Controller, Get, Param, NotFoundException, Req, Query, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { Request } from 'express';
+import { MonthQueryDto } from './dto/MonthQueryDto';
 import {
     UserProfile,
     RepositoryProfileMinified,
     OrganizationProfileMinified,
-    GistProfileMinified
+    GistProfileMinified,
+    MonthlyContributions
 } from 'github-api-fetcher';
-import { Request } from 'express';
 
 @Controller('users/:username')
 export class UsersController {
@@ -56,5 +58,23 @@ export class UsersController {
         if (!gists) throw new NotFoundException(`GitHub profile '${username}' not found`);
 
         return gists;
+    }
+
+    @Get('/contributions/commits/month')
+    async getUsersCommitContributionsInMonth(
+        @Req() req: Request,
+        @Param('username') username: string,
+        @Query(new ValidationPipe({ transform: true })) monthQuery: MonthQueryDto
+    ): Promise<MonthlyContributions> {
+        const contributions = await this.usersService.getUsersCommitContributionsInMonth(
+            req,
+            username,
+            monthQuery.year,
+            monthQuery.month
+        );
+
+        if (!contributions) throw new NotFoundException(`GitHub profile '${username}' not found`);
+
+        return contributions;
     }
 }

@@ -45,7 +45,7 @@ describe('UsersController (e2e)', (): void => {
             expect(response.status).toBe(404);
         });
 
-        describe('GET /:username/repositories', (): void => {
+        describe('GET /repositories', (): void => {
             it('should return 401 if no access token is passed', async (): Promise<void> => {
                 const response = await buildUnauthorizedGetRequest(app, '/users/dummy-user/repositories');
 
@@ -67,7 +67,7 @@ describe('UsersController (e2e)', (): void => {
             });
         });
 
-        describe('GET /:username/organizationMemberships', (): void => {
+        describe('GET /organizationMemberships', (): void => {
             it('should return 401 if no access token is passed', async (): Promise<void> => {
                 const response = await buildUnauthorizedGetRequest(app, '/users/dummy-user/organizationMemberships');
 
@@ -89,7 +89,7 @@ describe('UsersController (e2e)', (): void => {
             });
         });
 
-        describe('GET /:username/gists', (): void => {
+        describe('GET /gists', (): void => {
             it('should return 401 if no access token is passed', async (): Promise<void> => {
                 const response = await buildUnauthorizedGetRequest(app, '/users/dummy-user/gists');
 
@@ -108,6 +108,68 @@ describe('UsersController (e2e)', (): void => {
                 const response = await sendRequest(`/users/${nonExistingUsername}/gists`);
 
                 expect(response.status).toBe(404);
+            });
+        });
+
+        describe('GET /contributions', (): void => {
+            describe('GET /commits/month', (): void => {
+                const sendRequest = async (
+                    username: string,
+                    year: number | null,
+                    month: string | null
+                ): Promise<request.Response> => {
+                    return await buildGetRequest(app, `/users/${username}/contributions/commits/month`).query({
+                        year,
+                        month
+                    });
+                };
+
+                it('should return 401 if no access token is passed', async (): Promise<void> => {
+                    const response = await buildUnauthorizedGetRequest(
+                        app,
+                        '/users/dummy-user/contributions/commits/month'
+                    );
+
+                    expect(response.status).toBe(401);
+                });
+
+                it('should return contributions if existing username is passed', async (): Promise<void> => {
+                    const response = await sendRequest('torvalds', 2017, 'MAY');
+
+                    expect(response.status).toBe(200);
+                    expect(response.body).toBeDefined();
+                });
+
+                it('should return 404 if non-existing username is passed', async (): Promise<void> => {
+                    const nonExistingUsername = uuid();
+                    const response = await sendRequest(nonExistingUsername, 2019, 'JANUARY');
+
+                    expect(response.status).toBe(404);
+                });
+
+                it('should return 400 if no year query parameter is passed', async (): Promise<void> => {
+                    const response = await sendRequest('torvalds', null, 'JUNE'); // missing 'year' query parameter
+
+                    expect(response.status).toBe(400);
+                });
+
+                it('should return 400 if invalid year query parameter is passed', async (): Promise<void> => {
+                    const response = await sendRequest('torvalds', 1990, 'FEBRUARY'); // 'year' must be >= 2000
+
+                    expect(response.status).toBe(400);
+                });
+
+                it('should return 400 if no month query parameter is passed', async (): Promise<void> => {
+                    const response = await sendRequest('torvalds', 2019, null); // missing 'month' query parameter
+
+                    expect(response.status).toBe(400);
+                });
+
+                it('should return 400 if invalid month query parameter is passed', async (): Promise<void> => {
+                    const response = await sendRequest('torvalds', 2016, 'NON-EXISTING-MONTH'); // invalid 'month' query parameter
+
+                    expect(response.status).toBe(400);
+                });
             });
         });
     });

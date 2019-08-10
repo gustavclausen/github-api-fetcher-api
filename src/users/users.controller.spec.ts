@@ -4,11 +4,14 @@ import { UsersService } from './users.service';
 import { FetcherService } from '../fetcher/fetcher.service';
 import { Request } from 'express';
 import { NotFoundException } from '@nestjs/common';
+import { MonthQueryDto } from './dto/MonthQueryDto';
 import {
     UserProfile,
     RepositoryProfileMinified,
     OrganizationProfileMinified,
-    GistProfileMinified
+    GistProfileMinified,
+    Month,
+    MonthlyContributions
 } from 'github-api-fetcher';
 
 describe('Users Controller', (): void => {
@@ -149,6 +152,40 @@ describe('Users Controller', (): void => {
             );
 
             expect(await controller.getUsersGists(({} as unknown) as Request, 'test-user')).toBe(returnValue);
+        });
+    });
+
+    describe('getUsersCommitContributionsInMonth', (): void => {
+        it('should throw NotFoundException when UsersService returns null', async (): Promise<void> => {
+            jest.spyOn(userService, 'getUsersCommitContributionsInMonth').mockReturnValue(
+                new Promise((resolve): void => resolve(null))
+            );
+
+            await expect(
+                controller.getUsersCommitContributionsInMonth(({} as unknown) as Request, 'dummy-username', {
+                    month: Month.AUGUST,
+                    year: 2019
+                })
+            ).rejects.toThrowError(NotFoundException);
+        });
+
+        it('should return result from UsersService', async (): Promise<void> => {
+            const query: MonthQueryDto = { month: Month.APRIL, year: 2011 };
+            const returnValue = ({
+                month: 'APRIL'
+            } as unknown) as MonthlyContributions;
+
+            jest.spyOn(userService, 'getUsersCommitContributionsInMonth').mockReturnValue(
+                new Promise(
+                    (resolve): void => {
+                        resolve(returnValue);
+                    }
+                )
+            );
+
+            expect(
+                await controller.getUsersCommitContributionsInMonth(({} as unknown) as Request, 'test-user', query)
+            ).toBe(returnValue);
         });
     });
 });
