@@ -105,4 +105,15 @@ export class UsersService {
             this.fetcherService.fetcher.user.getPullRequestContributionsInMonth(username, year, month)
         );
     }
+
+    async getUsersPullRequestContributionsInYear(
+        req: Request,
+        username: string,
+        year: number
+    ): Promise<MonthlyPullRequestContributions[] | null> {
+        return await this.fetcherService.fetch(
+            req,
+            this.fetcherService.fetcher.user.getPullRequestContributionsInYear(username, year)
+        );
+    }
 }

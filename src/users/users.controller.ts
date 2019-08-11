@@ -150,4 +150,21 @@ export class UsersController {
 
         return contributions;
     }
+
+    @Get('/contributions/pull-requests/year')
+    async getUsersPullRequestContributionsInYear(
+        @Req() req: Request,
+        @Param('username') username: string,
+        @Query(new ValidationPipe({ transform: true })) yearQuery: YearQueryDto
+    ): Promise<MonthlyPullRequestContributions[]> {
+        const contributions = await this.usersService.getUsersPullRequestContributionsInYear(
+            req,
+            username,
+            yearQuery.year
+        );
+
+        if (!contributions) throw new NotFoundException(`GitHub profile '${username}' not found`);
+
+        return contributions;
+    }
 }
