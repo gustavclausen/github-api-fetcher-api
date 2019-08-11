@@ -12,7 +12,8 @@ import {
     OrganizationProfileMinified,
     GistProfileMinified,
     Month,
-    MonthlyContributions
+    MonthlyContributions,
+    MonthlyPullRequestContributions
 } from 'github-api-fetcher';
 
 describe('Users Controller', (): void => {
@@ -318,6 +319,40 @@ describe('Users Controller', (): void => {
 
             expect(
                 await controller.getUsersIssueContributionsInYear(({} as unknown) as Request, 'test-user', query)
+            ).toBe(returnValue);
+        });
+    });
+
+    describe('getUsersPullRequestContributionsInMonth', (): void => {
+        it('should throw NotFoundException when UsersService returns null', async (): Promise<void> => {
+            jest.spyOn(userService, 'getUsersPullRequestContributionsInMonth').mockReturnValue(
+                new Promise((resolve): void => resolve(null))
+            );
+
+            await expect(
+                controller.getUsersPullRequestContributionsInMonth(({} as unknown) as Request, 'dummy-username', {
+                    month: Month.AUGUST,
+                    year: 2019
+                })
+            ).rejects.toThrowError(NotFoundException);
+        });
+
+        it('should return result from UsersService', async (): Promise<void> => {
+            const query: MonthQueryDto = { month: Month.APRIL, year: 2011 };
+            const returnValue = ({
+                month: 'APRIL'
+            } as unknown) as MonthlyPullRequestContributions;
+
+            jest.spyOn(userService, 'getUsersPullRequestContributionsInMonth').mockReturnValue(
+                new Promise(
+                    (resolve): void => {
+                        resolve(returnValue);
+                    }
+                )
+            );
+
+            expect(
+                await controller.getUsersPullRequestContributionsInMonth(({} as unknown) as Request, 'test-user', query)
             ).toBe(returnValue);
         });
     });

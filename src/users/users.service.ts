@@ -7,7 +7,8 @@ import {
     OrganizationProfileMinified,
     GistProfileMinified,
     MonthlyContributions,
-    Month
+    Month,
+    MonthlyPullRequestContributions
 } from 'github-api-fetcher';
 
 @Injectable()
@@ -90,6 +91,18 @@ export class UsersService {
         return await this.fetcherService.fetch(
             req,
             this.fetcherService.fetcher.user.getIssueContributionsInYear(username, year)
+        );
+    }
+
+    async getUsersPullRequestContributionsInMonth(
+        req: Request,
+        username: string,
+        year: number,
+        month: Month
+    ): Promise<MonthlyPullRequestContributions | null> {
+        return await this.fetcherService.fetch(
+            req,
+            this.fetcherService.fetcher.user.getPullRequestContributionsInMonth(username, year, month)
         );
     }
 }
