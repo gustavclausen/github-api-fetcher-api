@@ -81,4 +81,15 @@ export class UsersService {
             this.fetcherService.fetcher.user.getIssueContributionsInMonth(username, year, month)
         );
     }
+
+    async getUsersIssueContributionsInYear(
+        req: Request,
+        username: string,
+        year: number
+    ): Promise<MonthlyContributions[] | null> {
+        return await this.fetcherService.fetch(
+            req,
+            this.fetcherService.fetcher.user.getIssueContributionsInYear(username, year)
+        );
+    }
 }
