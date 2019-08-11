@@ -224,4 +224,32 @@ describe('Users Controller', (): void => {
             ).toBe(returnValue);
         });
     });
+
+    describe('getUsersContributionYears', (): void => {
+        it('should throw NotFoundException when UsersService returns null', async (): Promise<void> => {
+            jest.spyOn(userService, 'getUsersContributionYears').mockReturnValue(
+                new Promise((resolve): void => resolve(null))
+            );
+
+            await expect(
+                controller.getUsersContributionYears(({} as unknown) as Request, 'dummy-username')
+            ).rejects.toThrowError(NotFoundException);
+        });
+
+        it('should return result from UsersService', async (): Promise<void> => {
+            const returnValue = [2019, 2018];
+
+            jest.spyOn(userService, 'getUsersContributionYears').mockReturnValue(
+                new Promise(
+                    (resolve): void => {
+                        resolve(returnValue);
+                    }
+                )
+            );
+
+            expect(await controller.getUsersContributionYears(({} as unknown) as Request, 'test-user')).toBe(
+                returnValue
+            );
+        });
+    });
 });

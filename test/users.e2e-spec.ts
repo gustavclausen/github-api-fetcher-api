@@ -214,6 +214,32 @@ describe('UsersController (e2e)', (): void => {
                     expect(response.status).toBe(400);
                 });
             });
+
+            describe('GET /years', (): void => {
+                const sendRequest = async (username: string): Promise<request.Response> => {
+                    return await buildGetRequest(app, `/users/${username}/contributions/years`);
+                };
+
+                it('should return 401 if no access token is passed', async (): Promise<void> => {
+                    const response = await buildUnauthorizedGetRequest(app, '/users/dummy-user/contributions/years');
+
+                    expect(response.status).toBe(401);
+                });
+
+                it('should return years if existing username is passed', async (): Promise<void> => {
+                    const response = await sendRequest('torvalds');
+
+                    expect(response.status).toBe(200);
+                    expect(response.body.length).toBeGreaterThan(0);
+                });
+
+                it('should return 404 if non-existing username is passed', async (): Promise<void> => {
+                    const nonExistingUsername = uuid();
+                    const response = await sendRequest(nonExistingUsername);
+
+                    expect(response.status).toBe(404);
+                });
+            });
         });
     });
 

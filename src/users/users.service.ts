@@ -65,4 +65,8 @@ export class UsersService {
             this.fetcherService.fetcher.user.getCommitContributionsInYear(username, year)
         );
     }
+
+    async getUsersContributionYears(req: Request, username: string): Promise<number[] | null> {
+        return await this.fetcherService.fetch(req, this.fetcherService.fetcher.user.getContributionYears(username));
+    }
 }

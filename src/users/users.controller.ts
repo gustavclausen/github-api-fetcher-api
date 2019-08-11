@@ -91,4 +91,13 @@ export class UsersController {
 
         return contributions;
     }
+
+    @Get('/contributions/years')
+    async getUsersContributionYears(@Req() req: Request, @Param('username') username: string): Promise<number[]> {
+        const years = await this.usersService.getUsersContributionYears(req, username);
+
+        if (!years) throw new NotFoundException(`GitHub profile '${username}' not found`);
+
+        return years;
+    }
 }
