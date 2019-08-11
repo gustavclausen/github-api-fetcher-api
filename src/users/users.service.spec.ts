@@ -30,7 +30,8 @@ describe('UsersService', (): void => {
                                     getIssueContributionsInYear: jest.fn(),
                                     getPullRequestContributionsInMonth: jest.fn(),
                                     getPullRequestContributionsInYear: jest.fn(),
-                                    getPullRequestReviewContributionsInMonth: jest.fn()
+                                    getPullRequestReviewContributionsInMonth: jest.fn(),
+                                    getPullRequestReviewContributionsInYear: jest.fn()
                                 }
                             }
                         }
@@ -156,6 +157,18 @@ describe('UsersService', (): void => {
                 'dummy-username',
                 2019,
                 Month.APRIL
+            );
+
+            expect(fetchMock).toHaveBeenCalled();
+        });
+    });
+
+    describe('getUsersPullRequestReviewContributionsInYear', (): void => {
+        it('should call fetch method on FetcherService', async (): Promise<void> => {
+            await service.getUsersPullRequestReviewContributionsInYear(
+                ({} as unknown) as Request,
+                'dummy-username',
+                2019
             );
 
             expect(fetchMock).toHaveBeenCalled();

@@ -429,4 +429,43 @@ describe('Users Controller', (): void => {
             ).toBe(returnValue);
         });
     });
+
+    describe('getUsersPullRequestReviewContributionsInYear', (): void => {
+        it('should throw NotFoundException when UsersService returns null', async (): Promise<void> => {
+            jest.spyOn(userService, 'getUsersPullRequestReviewContributionsInYear').mockReturnValue(
+                new Promise((resolve): void => resolve(null))
+            );
+
+            await expect(
+                controller.getUsersPullRequestReviewContributionsInYear(({} as unknown) as Request, 'dummy-username', {
+                    year: 2019
+                })
+            ).rejects.toThrowError(NotFoundException);
+        });
+
+        it('should return result from UsersService', async (): Promise<void> => {
+            const query: YearQueryDto = { year: 2011 };
+            const returnValue = [
+                ({
+                    month: 'JANUARY'
+                } as unknown) as MonthlyContributions
+            ];
+
+            jest.spyOn(userService, 'getUsersPullRequestReviewContributionsInYear').mockReturnValue(
+                new Promise(
+                    (resolve): void => {
+                        resolve(returnValue);
+                    }
+                )
+            );
+
+            expect(
+                await controller.getUsersPullRequestReviewContributionsInYear(
+                    ({} as unknown) as Request,
+                    'test-user',
+                    query
+                )
+            ).toBe(returnValue);
+        });
+    });
 });
