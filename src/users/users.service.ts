@@ -116,4 +116,16 @@ export class UsersService {
             this.fetcherService.fetcher.user.getPullRequestContributionsInYear(username, year)
         );
     }
+
+    async getUsersPullRequestReviewContributionsInMonth(
+        req: Request,
+        username: string,
+        year: number,
+        month: Month
+    ): Promise<MonthlyContributions | null> {
+        return await this.fetcherService.fetch(
+            req,
+            this.fetcherService.fetcher.user.getPullRequestReviewContributionsInMonth(username, year, month)
+        );
+    }
 }
